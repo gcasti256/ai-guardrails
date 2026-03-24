@@ -22,17 +22,19 @@ packages = [{ include = "guardrails", from = "src" }, { include = "api", from = 
 guardrails = "cli.main:app"
 
 [tool.poetry.dependencies]
-python = "^3.11"
-pydantic = "^2.6"
-pyyaml = "^6.0"
-spacy = "^3.7"
-presidio-analyzer = "^2.2"
-presidio-anonymizer = "^2.2"
-fastapi = "^0.111"
-uvicorn = { version = "^0.29", extras = ["standard"] }
-typer = { version = "^0.12", extras = ["all"] }
-langdetect = "^1.0.9"
-structlog = "^24.1"
+python = ">=3.11,<4.0"
+pydantic = ">=2.6"
+pyyaml = ">=6.0"
+fastapi = ">=0.111"
+uvicorn = { version = ">=0.29", extras = ["standard"] }
+typer = { version = ">=0.12", extras = ["all"] }
+langdetect = ">=1.0.9"
+structlog = ">=24.1"
+
+[tool.poetry.extras]
+nlp = ["spacy"]
+presidio = ["presidio-analyzer", "presidio-anonymizer"]
+all = ["spacy", "presidio-analyzer", "presidio-anonymizer"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1"

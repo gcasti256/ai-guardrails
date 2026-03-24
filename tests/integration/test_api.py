@@ -2,18 +2,22 @@
 
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from api.main import app
+from api.main import app, lifespan
 
 
 @pytest.fixture
-async def client() -> AsyncClient:
-    """Create an async test client for the FastAPI app."""
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        yield ac
+async def client() -> AsyncGenerator[AsyncClient, None]:
+    """Create an async test client for the FastAPI app with lifespan."""
+    async with lifespan(app):
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as ac:
+            yield ac
 
 
 @pytest.mark.asyncio
