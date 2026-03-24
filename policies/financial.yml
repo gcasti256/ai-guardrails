@@ -1,0 +1,90 @@
+name: financial
+version: "1.0"
+description: Financial data policy for PCI-DSS compliance — strict credit card and financial data handling
+
+rules:
+  - name: block-credit-cards
+    description: Block any output containing credit card numbers (PCI-DSS requirement)
+    detector_type: pii
+    config:
+      entity_types:
+        - CREDIT_CARD
+      min_confidence: 0.8
+    action: deny
+    severity: critical
+    enabled: true
+
+  - name: redact-financial-pii
+    description: Redact SSNs, account numbers, and financial identifiers
+    detector_type: pii
+    config:
+      entity_types:
+        - SSN
+        - CREDIT_CARD
+        - PERSON
+        - PHONE
+        - EMAIL
+      min_confidence: 0.6
+    action: redact
+    severity: critical
+    enabled: true
+
+  - name: detect-account-patterns
+    description: Detect potential bank account and routing numbers
+    detector_type: pii
+    config:
+      entity_types:
+        - SSN
+        - CREDIT_CARD
+        - EMPLOYEE_ID
+      min_confidence: 0.5
+    action: warn
+    severity: high
+    enabled: true
+
+  - name: block-injection
+    description: Block prompt injection — financial data exfiltration prevention
+    detector_type: injection
+    config:
+      sensitivity: high
+      min_confidence: 0.4
+    action: deny
+    severity: critical
+    enabled: true
+
+  - name: flag-toxicity
+    description: Flag toxic content in financial communications
+    detector_type: toxicity
+    config:
+      threshold: 0.5
+      categories:
+        - HATE_SPEECH
+        - HARASSMENT
+    action: warn
+    severity: high
+    enabled: true
+
+  - name: check-language
+    description: Financial documents must be in supported languages
+    detector_type: language
+    config:
+      allowed_languages:
+        - en
+    action: warn
+    severity: low
+    enabled: true
+
+default_action: allow
+
+metadata:
+  author: Financial Compliance Team
+  compliance_frameworks:
+    - PCI-DSS
+    - SOX
+    - GDPR
+    - SOC2
+  pci_dss_requirements:
+    - "3.4: Render PAN unreadable anywhere it is stored"
+    - "3.3: Mask PAN when displayed"
+    - "4.1: Use strong cryptography for transmission"
+  last_reviewed: "2025-01-15"

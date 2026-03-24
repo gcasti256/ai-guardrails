@@ -1,0 +1,88 @@
+name: enterprise-default
+version: "1.0"
+description: Standard enterprise AI safety policy — balanced protection for general business use
+
+rules:
+  - name: detect-pii
+    description: Detect and flag all standard PII types
+    detector_type: pii
+    config:
+      entity_types:
+        - SSN
+        - CREDIT_CARD
+        - EMAIL
+        - PHONE
+        - IP_ADDRESS
+        - PERSON
+        - ORGANIZATION
+      min_confidence: 0.7
+    action: warn
+    severity: high
+    enabled: true
+
+  - name: redact-ssn
+    description: Automatically redact Social Security Numbers
+    detector_type: pii
+    config:
+      entity_types:
+        - SSN
+      min_confidence: 0.8
+    action: redact
+    severity: critical
+    enabled: true
+
+  - name: redact-credit-card
+    description: Automatically redact credit card numbers
+    detector_type: pii
+    config:
+      entity_types:
+        - CREDIT_CARD
+      min_confidence: 0.9
+    action: redact
+    severity: critical
+    enabled: true
+
+  - name: block-injection
+    description: Block detected prompt injection attempts
+    detector_type: injection
+    config:
+      sensitivity: medium
+      min_confidence: 0.6
+    action: deny
+    severity: critical
+    enabled: true
+
+  - name: flag-toxicity
+    description: Flag toxic content for review
+    detector_type: toxicity
+    config:
+      threshold: 0.6
+      categories:
+        - HATE_SPEECH
+        - HARASSMENT
+        - VIOLENCE
+    action: warn
+    severity: high
+    enabled: true
+
+  - name: check-language
+    description: Ensure content is in an allowed language
+    detector_type: language
+    config:
+      allowed_languages:
+        - en
+        - es
+        - fr
+        - de
+    action: warn
+    severity: low
+    enabled: true
+
+default_action: allow
+
+metadata:
+  author: AI Safety Team
+  compliance_frameworks:
+    - SOC2
+    - GDPR
+  last_reviewed: "2025-01-15"

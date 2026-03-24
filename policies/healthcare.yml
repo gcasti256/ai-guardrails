@@ -1,0 +1,113 @@
+name: healthcare
+version: "1.0"
+description: HIPAA-aware policy for healthcare AI applications — strict PII handling with PHI detection
+
+rules:
+  - name: detect-phi
+    description: Detect Protected Health Information (PHI) per HIPAA Safe Harbor
+    detector_type: pii
+    config:
+      entity_types:
+        - SSN
+        - PERSON
+        - PHONE
+        - EMAIL
+        - IP_ADDRESS
+        - ORGANIZATION
+        - LOCATION
+      min_confidence: 0.5
+    action: deny
+    severity: critical
+    enabled: true
+
+  - name: redact-all-pii
+    description: Redact all detected PII — zero tolerance for PHI leakage
+    detector_type: pii
+    config:
+      entity_types:
+        - SSN
+        - CREDIT_CARD
+        - PERSON
+        - PHONE
+        - EMAIL
+        - IP_ADDRESS
+        - ORGANIZATION
+        - LOCATION
+        - EMPLOYEE_ID
+      min_confidence: 0.4
+    action: redact
+    severity: critical
+    enabled: true
+
+  - name: block-injection
+    description: Block prompt injection with high sensitivity
+    detector_type: injection
+    config:
+      sensitivity: high
+      min_confidence: 0.4
+    action: deny
+    severity: critical
+    enabled: true
+
+  - name: block-toxicity
+    description: Block all toxic content in healthcare context
+    detector_type: toxicity
+    config:
+      threshold: 0.4
+      categories:
+        - HATE_SPEECH
+        - HARASSMENT
+        - VIOLENCE
+        - SELF_HARM
+    action: deny
+    severity: critical
+    enabled: true
+
+  - name: enforce-english
+    description: Healthcare content must be in English for compliance documentation
+    detector_type: language
+    config:
+      allowed_languages:
+        - en
+    action: warn
+    severity: medium
+    enabled: true
+
+  - name: sentiment-check
+    description: Flag highly negative sentiment for clinical safety review
+    detector_type: sentiment
+    config:
+      min_score: -0.7
+      flag_negative: true
+    action: warn
+    severity: medium
+    enabled: true
+
+default_action: allow
+
+metadata:
+  author: Healthcare Compliance Team
+  compliance_frameworks:
+    - HIPAA
+    - HITECH
+    - SOC2
+  hipaa_safe_harbor_identifiers:
+    - names
+    - geographic_data
+    - dates
+    - phone_numbers
+    - fax_numbers
+    - email_addresses
+    - ssn
+    - medical_record_numbers
+    - health_plan_numbers
+    - account_numbers
+    - certificate_numbers
+    - vehicle_ids
+    - device_ids
+    - urls
+    - ip_addresses
+    - biometric_ids
+    - photos
+    - other_unique_ids
+  last_reviewed: "2025-01-15"

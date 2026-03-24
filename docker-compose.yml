@@ -1,0 +1,35 @@
+services:
+  guardrails-api:
+    build:
+      context: .
+      target: base
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - POLICY_DIR=/app/policies
+    volumes:
+      - ./policies:/app/policies:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  guardrails-dev:
+    build:
+      context: .
+      target: dev
+    ports:
+      - "${DEV_PORT:-8001}:8000"
+    environment:
+      - LOG_LEVEL=debug
+      - POLICY_DIR=/app/policies
+    volumes:
+      - ./src:/app/src
+      - ./policies:/app/policies
+      - ./tests:/app/tests
+    profiles:
+      - dev

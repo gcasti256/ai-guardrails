@@ -1,0 +1,84 @@
+name: strict
+version: "1.0"
+description: Maximum safety policy — paranoid detection levels, deny-by-default for any flagged content
+
+rules:
+  - name: block-all-pii
+    description: Block any content containing PII of any type
+    detector_type: pii
+    config:
+      entity_types:
+        - SSN
+        - CREDIT_CARD
+        - EMAIL
+        - PHONE
+        - IP_ADDRESS
+        - PERSON
+        - ORGANIZATION
+        - LOCATION
+        - EMPLOYEE_ID
+        - INTERNAL_URL
+      min_confidence: 0.3
+    action: deny
+    severity: critical
+    enabled: true
+
+  - name: paranoid-injection
+    description: Maximum sensitivity injection detection
+    detector_type: injection
+    config:
+      sensitivity: paranoid
+      min_confidence: 0.2
+    action: deny
+    severity: critical
+    enabled: true
+
+  - name: block-all-toxicity
+    description: Zero tolerance for any toxicity category
+    detector_type: toxicity
+    config:
+      threshold: 0.3
+      categories:
+        - HATE_SPEECH
+        - HARASSMENT
+        - VIOLENCE
+        - SEXUAL
+        - SELF_HARM
+        - PROFANITY
+    action: deny
+    severity: critical
+    enabled: true
+
+  - name: english-only
+    description: Strict English-only policy
+    detector_type: language
+    config:
+      allowed_languages:
+        - en
+    action: deny
+    severity: high
+    enabled: true
+
+  - name: negative-sentiment-block
+    description: Block highly negative content
+    detector_type: sentiment
+    config:
+      min_score: -0.6
+      flag_negative: true
+    action: deny
+    severity: high
+    enabled: true
+
+default_action: allow
+
+metadata:
+  author: Security Team
+  compliance_frameworks:
+    - HIPAA
+    - PCI-DSS
+    - SOX
+    - GDPR
+    - SOC2
+    - FedRAMP
+  notes: "Use this policy for highest-risk environments. May produce false positives."
+  last_reviewed: "2025-01-15"
